@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate-seed": "node scripts/generate-seed.mjs"
+    "generate-seed": "node scripts/generate-seed.mjs",
+    "test-agent": "tsx --env-file=.env.local scripts/test-agent.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -32,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }

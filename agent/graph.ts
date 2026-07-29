@@ -1,16 +1,27 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { createDeepAgent } from "deepagents";
+import { model } from "./model";
+import { MAIN_AGENT_PROMPT, REWRITER_PROMPT } from "./prompts";
+import {
+  getClientProfile,
+  lookupComplianceRules,
+  flagViolation,
+  checkSubstantiation,
+  saveReview,
+} from "./tools";
 
-const model = new ChatGoogleGenerativeAI({
-  model: "gemini-3.5-flash",
-  apiKey: process.env.GOOGLE_API_KEY,
-  // Free-tier Gemini is rate-limited (~10 RPM); rely on LangChain's built-in
-  // exponential backoff on retryable errors (429/5xx) instead of hand-rolling it.
-  maxRetries: 5,
-});
+export { model } from "./model";
 
 export const agent = createDeepAgent({
   model,
-  systemPrompt:
-    "You are ClaimGuard, a healthcare marketing compliance reviewer.",
+  systemPrompt: MAIN_AGENT_PROMPT,
+  tools: [getClientProfile, lookupComplianceRules, flagViolation, checkSubstantiation, saveReview],
+  subagents: [
+    {
+      name: "rewriter",
+      description:
+        "Rewrites the reviewed marketing copy to resolve every flagged compliance issue while preserving marketing intent and the client's brand tone. Call this once, after all findings are flagged and the overall risk is decided — never write the rewrite yourself. This subagent has no memory of the review conversation: in the task description, include the full original draft text, the complete list of findings (each with its flagged span, rule id, and suggested fix), and the client's brand tone. Returns the rewritten copy as plain text.",
+      systemPrompt: REWRITER_PROMPT,
+      tools: [],
+    },
+  ],
 });
