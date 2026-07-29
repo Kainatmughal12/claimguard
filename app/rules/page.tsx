@@ -16,19 +16,39 @@ const SEVERITY_VARIANT = {
   low: "outline",
 } as const;
 
-export default async function RulesPage() {
-  const { data: rules, error } = await supabase
-    .from("compliance_rules")
-    .select("*")
-    .order("category")
-    .order("id");
+// Queries Supabase on every request instead of at build time. Without this,
+// Next.js tries to statically prerender the page during `next build`, which
+// runs the Supabase query in the build sandbox — if that's unreachable
+// (as on Vercel's build step) the build fails with "Failed to collect page
+// data" instead of the page just rendering normally at request time.
+export const dynamic = "force-dynamic";
 
-  if (error) {
+export default async function RulesPage() {
+  let rules: ComplianceRule[] | null = null;
+  let errorMessage: string | null = null;
+
+  try {
+    const { data, error } = await supabase
+      .from("compliance_rules")
+      .select("*")
+      .order("category")
+      .order("id");
+
+    if (error) {
+      errorMessage = error.message;
+    } else {
+      rules = data;
+    }
+  } catch (err) {
+    errorMessage = err instanceof Error ? err.message : "Unknown error";
+  }
+
+  if (errorMessage) {
     return (
       <main className="mx-auto max-w-3xl p-8">
         <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
         <p className="mt-4 text-destructive">
-          Couldn&apos;t load rules: {error.message}
+          Couldn&apos;t load rules: {errorMessage}
         </p>
       </main>
     );
