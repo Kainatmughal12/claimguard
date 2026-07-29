@@ -3,12 +3,13 @@
 //
 // Usage: npx tsx scripts/test-agent.ts
 import { agent } from "../agent/graph";
+import { buildReviewMessage, type ContentType } from "../agent/buildReviewMessage";
 
 interface Draft {
   label: "clean" | "flagrant" | "borderline";
   clientId: string;
   clientName: string;
-  contentType: "social_post" | "ad_copy" | "blog" | "email";
+  contentType: ContentType;
   text: string;
 }
 
@@ -115,7 +116,11 @@ async function runDraft(draft: Draft) {
         messages: [
           {
             role: "user",
-            content: `Client ID: ${draft.clientId}\nContent type: ${draft.contentType}\n\nReview this draft:\n\n${draft.text}`,
+            content: buildReviewMessage({
+              clientId: draft.clientId,
+              contentType: draft.contentType,
+              text: draft.text,
+            }),
           },
         ],
       });
