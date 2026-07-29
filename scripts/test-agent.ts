@@ -3,7 +3,8 @@
 //
 // Usage: npx tsx scripts/test-agent.ts
 import { agent } from "../agent/graph";
-import { buildReviewMessage, type ContentType } from "../agent/buildReviewMessage";
+import { buildReviewMessage } from "../agent/buildReviewMessage";
+import type { ContentType } from "../lib/types";
 
 interface Draft {
   label: "clean" | "flagrant" | "borderline";

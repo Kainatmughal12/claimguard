@@ -1,4 +1,4 @@
-export type ContentType = "social_post" | "ad_copy" | "blog" | "email";
+import type { ContentType } from "@/lib/types";
 
 export function buildReviewMessage(params: {
   clientId: string;

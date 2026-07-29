@@ -3,17 +3,13 @@ import { z } from "zod";
 import { agent } from "@/agent/graph";
 import { buildReviewMessage } from "@/agent/buildReviewMessage";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import type { StreamEvent, ReviewRecord, FindingRecord } from "@/lib/types";
 
 const requestSchema = z.object({
   clientId: z.string().uuid(),
   contentType: z.enum(["social_post", "ad_copy", "blog", "email"]),
   originalText: z.string().min(1),
 });
-
-type StreamEvent =
-  | { type: "progress"; message: string }
-  | { type: "done"; reviewId: string; review: Record<string, unknown>; findings: unknown[] }
-  | { type: "error"; message: string };
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -150,8 +146,8 @@ export async function POST(request: NextRequest) {
         send({
           type: "done",
           reviewId,
-          review: reviewRow,
-          findings: findingsRows ?? [],
+          review: reviewRow as ReviewRecord,
+          findings: (findingsRows ?? []) as FindingRecord[],
         });
       } catch (err) {
         send({
