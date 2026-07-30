@@ -1,4 +1,4 @@
-import type { Severity } from "@/lib/types";
+import type { OverallRisk, Severity } from "@/lib/types";
 
 // Single source of truth for severity color usage — reused identically by
 // the finding-card badge and the text-highlight background so the same
@@ -19,4 +19,19 @@ export const SEVERITY_HIGHLIGHT_CLASS: Record<Severity, string> = {
   high: "bg-severity-high/15 dark:bg-severity-high/25",
   medium: "bg-severity-medium/15 dark:bg-severity-medium/25",
   low: "bg-severity-low/15 dark:bg-severity-low/25",
+};
+
+// Overall risk reuses the same severity color system: high_risk maps to the
+// same red as a high-severity finding, needs_revision to the medium amber,
+// and pass to the color reserved for the all-clear state.
+export const OVERALL_RISK_LABEL: Record<OverallRisk, string> = {
+  high_risk: "High Risk",
+  needs_revision: "Needs Revision",
+  pass: "Pass",
+};
+
+export const OVERALL_RISK_BADGE_CLASS: Record<OverallRisk, string> = {
+  high_risk: "bg-severity-high/10 text-severity-high dark:bg-severity-high/20",
+  needs_revision: "bg-severity-medium/10 text-severity-medium dark:bg-severity-medium/20",
+  pass: "bg-severity-pass/10 text-severity-pass dark:bg-severity-pass/20",
 };

@@ -6,7 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { SEVERITY_BADGE_CLASS, SEVERITY_LABEL } from "@/lib/severity";
+import {
+  OVERALL_RISK_BADGE_CLASS,
+  OVERALL_RISK_LABEL,
+  SEVERITY_BADGE_CLASS,
+  SEVERITY_LABEL,
+} from "@/lib/severity";
 import type { FindingRecord, ReviewRecord } from "@/lib/types";
 
 interface FindingsPanelProps {
@@ -38,6 +43,15 @@ export function FindingsPanel({
 
   return (
     <div className="space-y-4">
+      <Badge
+        className={cn(
+          "h-7 rounded-full px-3 text-sm font-semibold",
+          OVERALL_RISK_BADGE_CLASS[review.overall_risk],
+        )}
+      >
+        {OVERALL_RISK_LABEL[review.overall_risk]}
+      </Badge>
+
       <div>
         <h2 className="text-sm font-medium text-muted-foreground">
           {findings.length === 0 ? "Findings" : `Findings (${findings.length})`}

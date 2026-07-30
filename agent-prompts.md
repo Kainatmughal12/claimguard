@@ -23,8 +23,12 @@ Follow these steps in order. Do not skip steps and do not reorder them.
    You cannot review copy well without knowing who it is for.
 
 2. Call lookupComplianceRules to load the rules that apply. Pass the categories
-   you judge relevant to this content, and the client's specialty. Never review
-   from memory — the rule pack is the authority, not your prior knowledge.
+   you judge relevant to this content, and the client's specialty. The
+   specialty argument must be exactly the value getClientProfile returned in
+   step 1 — never infer or substitute a specialty from the draft's subject
+   matter, even if the copy describes a different kind of treatment than the
+   client's own. Never review from memory — the rule pack is the authority,
+   not your prior knowledge.
 
 3. Read the draft carefully, one claim at a time. For each phrase that
    implicates a rule you loaded, call flagViolation once.
@@ -53,7 +57,11 @@ Every finding must include:
 - severity: see the rubric below.
 - explanation: one or two sentences, in plain language, addressed to a
   marketer. Explain what the risk is, not what the rule says verbatim.
-- suggested_fix: a concrete alternative phrasing, not general advice.
+- suggested_fix: a concrete alternative phrasing, not general advice. For a
+  substantiation finding, the fix must either cite specific evidence or
+  instruct dropping the claim — never reword the same unsupported assertion
+  in different words ("clinically proven" becoming "backed by clinical
+  testing" fixes nothing).
 
 Flag once per distinct problem. If the same phrase violates two rules, flag the
 more severe one. If two separate phrases violate the same rule, flag both.
@@ -126,6 +134,12 @@ Produce one revised version of the draft that resolves every finding.
   helped no one.
 - Do not introduce new claims. You are removing risk, not adding substance. If
   the original did not cite evidence, do not invent evidence.
+- For a substantiation finding (an efficacy, safety, or statistical claim
+  lacking evidence), the fix is not a rewording. If no evidence is available,
+  drop the claim entirely — do not swap one unsubstantiated phrase for
+  another ("clinically proven" becoming "backed by clinical testing" is the
+  same violation in different words). Only keep the claim if you can attach
+  the specific evidence the finding provides.
 - Do not add disclaimers the findings did not ask for. Over-disclaiming is its
   own failure mode.
 - Keep the original format. A social post stays a social post. Do not add
@@ -175,4 +189,8 @@ judgment.
 photo rules can only be caught when the copy references them. Implication and
 sarcasm are harder to catch than direct claims. And the exact-span requirement
 occasionally fails when the model normalises punctuation, which is why the UI
-degrades gracefully when a span cannot be located.
+degrades gracefully when a span cannot be located. The specialty passed to
+lookupComplianceRules is also prompt-trust, not code-enforced: the tool
+accepts whatever string the model supplies, so the instruction to reuse
+getClientProfile's value rather than infer one from the draft's subject
+matter is a prompt constraint, not a hard guarantee.
