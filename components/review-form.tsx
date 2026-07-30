@@ -102,13 +102,14 @@ export function ReviewForm({ clients, status, onSubmit, onCancel }: ReviewFormPr
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-medium text-muted-foreground">Draft</label>
-          <div className="flex gap-1">
+          <div className="flex gap-3">
             {EXAMPLE_DRAFTS.map((example) => (
               <Button
                 key={example.label}
                 type="button"
-                variant="ghost"
-                size="sm"
+                variant="link"
+                size="xs"
+                className="h-auto p-0 font-normal text-xs"
                 disabled={isStreaming}
                 onClick={() => {
                   setText(example.text);

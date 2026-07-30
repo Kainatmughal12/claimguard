@@ -80,9 +80,9 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
         />
       </div>
 
-      <div className="min-w-0 rounded-lg border p-4">
+      <div className={submittedText === null ? "min-w-0 self-start rounded-lg border p-4" : "min-w-0 rounded-lg border p-4"}>
         {submittedText === null ? (
-          <p className="text-sm text-muted-foreground italic">Your draft will appear here.</p>
+          <p className="text-sm text-muted-foreground">Your draft will appear here.</p>
         ) : (
           <HighlightedText
             text={submittedText}
@@ -113,7 +113,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
           />
         )}
         {status === "idle" && submittedText === null && (
-          <p className="text-sm text-muted-foreground italic">Findings will appear here.</p>
+          <p className="text-sm text-muted-foreground">Findings will appear here.</p>
         )}
       </div>
     </div>
