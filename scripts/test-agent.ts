@@ -4,6 +4,7 @@
 // Usage: npx tsx scripts/test-agent.ts
 import { agent } from "../agent/graph";
 import { buildReviewMessage } from "../agent/buildReviewMessage";
+import { isRateLimitError } from "../lib/rateLimit";
 import type { ContentType } from "../lib/types";
 
 interface Draft {
@@ -84,16 +85,6 @@ const RETRY_BASE_DELAY_MS = 15_000;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function isRateLimitError(err: unknown): boolean {
-  const message = (err instanceof Error ? err.message : String(err)).toLowerCase();
-  return (
-    message.includes("429") ||
-    message.includes("rate limit") ||
-    message.includes("resource_exhausted") ||
-    message.includes("quota")
-  );
 }
 
 interface ToolCall {
