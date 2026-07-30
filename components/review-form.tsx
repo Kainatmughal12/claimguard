@@ -19,6 +19,19 @@ const CONTENT_TYPES: { value: ContentType; label: string }[] = [
   { value: "email", label: "Email" },
 ];
 
+const EXAMPLE_DRAFTS: { label: string; contentType: ContentType; text: string }[] = [
+  {
+    label: "Clean example",
+    contentType: "social_post",
+    text: "New patient special this month — book your first cleaning and exam with us today!",
+  },
+  {
+    label: "Flagrant example",
+    contentType: "ad_copy",
+    text: "Guaranteed to whiten your teeth in just 3 days — 100% safe, no risk, and clinically proven! Join thousands of happy patients.",
+  },
+];
+
 interface ReviewFormProps {
   clients: Client[];
   status: "idle" | "streaming" | "done" | "error";
@@ -41,7 +54,8 @@ export function ReviewForm({ clients, status, onSubmit, onCancel }: ReviewFormPr
         <Select value={clientId} onValueChange={setClientId} disabled={isStreaming}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a client">
-              {(value: string) => {
+              {(value: string | null) => {
+                if (!value) return "Select a client";
                 const client = clients.find((c) => c.id === value);
                 return client ? `${client.name} (${client.specialty})` : value;
               }}
@@ -69,7 +83,10 @@ export function ReviewForm({ clients, status, onSubmit, onCancel }: ReviewFormPr
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a content type">
-              {(value: string) => CONTENT_TYPES.find((o) => o.value === value)?.label ?? value}
+              {(value: string | null) => {
+                if (!value) return "Select a content type";
+                return CONTENT_TYPES.find((o) => o.value === value)?.label ?? value;
+              }}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -83,7 +100,26 @@ export function ReviewForm({ clients, status, onSubmit, onCancel }: ReviewFormPr
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">Draft</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-medium text-muted-foreground">Draft</label>
+          <div className="flex gap-1">
+            {EXAMPLE_DRAFTS.map((example) => (
+              <Button
+                key={example.label}
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={isStreaming}
+                onClick={() => {
+                  setText(example.text);
+                  setContentType(example.contentType);
+                }}
+              >
+                {example.label}
+              </Button>
+            ))}
+          </div>
+        </div>
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}

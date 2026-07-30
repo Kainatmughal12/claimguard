@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { ReviewWorkspace } from "@/components/review-workspace";
 import type { Client } from "@/lib/types";
@@ -28,8 +29,21 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b px-4 py-2">
-        <h1 className="text-sm font-medium">ClaimGuard</h1>
+      <header className="flex items-center justify-between border-b px-6 py-3">
+        <div>
+          <h1 className="text-sm font-medium">ClaimGuard</h1>
+          <p className="text-xs text-muted-foreground">
+            AI-assisted compliance review for healthcare marketing copy — not legal advice.
+          </p>
+        </div>
+        <nav className="flex gap-4 text-sm text-muted-foreground">
+          <Link href="/" className="text-foreground">
+            Review
+          </Link>
+          <Link href="/rules" className="hover:text-foreground">
+            Rules
+          </Link>
+        </nav>
       </header>
       <ReviewWorkspace clients={clients} />
     </div>

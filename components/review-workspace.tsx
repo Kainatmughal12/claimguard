@@ -70,7 +70,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
   }
 
   return (
-    <div className="grid flex-1 grid-cols-1 gap-4 p-4 lg:grid-cols-[320px_1fr_360px]">
+    <div className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-4 p-6 lg:grid-cols-[320px_1fr_360px]">
       <div>
         <ReviewForm
           clients={clients}
@@ -82,9 +82,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
 
       <div className="min-w-0 rounded-lg border p-4">
         {submittedText === null ? (
-          <p className="text-sm text-muted-foreground">
-            Submit a draft to see it here, with any compliance issues highlighted.
-          </p>
+          <p className="text-sm text-muted-foreground italic">Your draft will appear here.</p>
         ) : (
           <HighlightedText
             text={submittedText}
@@ -115,9 +113,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
           />
         )}
         {status === "idle" && submittedText === null && (
-          <p className="text-sm text-muted-foreground">
-            Findings and the rewrite will appear here once you submit a draft.
-          </p>
+          <p className="text-sm text-muted-foreground italic">Findings will appear here.</p>
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
   Card,
@@ -23,6 +24,22 @@ const SEVERITY_VARIANT = {
 // data" instead of the page just rendering normally at request time.
 export const dynamic = "force-dynamic";
 
+function SiteNav() {
+  return (
+    <header className="flex items-center justify-between border-b px-6 py-3">
+      <h1 className="text-sm font-medium">ClaimGuard</h1>
+      <nav className="flex gap-4 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-foreground">
+          Review
+        </Link>
+        <Link href="/rules" className="text-foreground">
+          Rules
+        </Link>
+      </nav>
+    </header>
+  );
+}
+
 export default async function RulesPage() {
   let rules: ComplianceRule[] | null = null;
   let errorMessage: string | null = null;
@@ -45,23 +62,29 @@ export default async function RulesPage() {
 
   if (errorMessage) {
     return (
-      <main className="mx-auto max-w-3xl p-8">
-        <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
-        <p className="mt-4 text-destructive">
-          Couldn&apos;t load rules: {errorMessage}
-        </p>
-      </main>
+      <>
+        <SiteNav />
+        <main className="mx-auto max-w-3xl p-8">
+          <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
+          <p className="mt-4 text-destructive">
+            Couldn&apos;t load rules: {errorMessage}
+          </p>
+        </main>
+      </>
     );
   }
 
   if (!rules || rules.length === 0) {
     return (
-      <main className="mx-auto max-w-3xl p-8">
-        <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
-        <p className="mt-4 text-muted-foreground">
-          No rules found. Has supabase/seed.sql been applied yet?
-        </p>
-      </main>
+      <>
+        <SiteNav />
+        <main className="mx-auto max-w-3xl p-8">
+          <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
+          <p className="mt-4 text-muted-foreground">
+            No rules found. Has supabase/seed.sql been applied yet?
+          </p>
+        </main>
+      </>
     );
   }
 
@@ -73,7 +96,9 @@ export default async function RulesPage() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl space-y-10 p-8">
+    <>
+      <SiteNav />
+      <main className="mx-auto max-w-3xl space-y-10 p-8">
       <div>
         <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -124,6 +149,7 @@ export default async function RulesPage() {
           </div>
         </section>
       ))}
-    </main>
+      </main>
+    </>
   );
 }
