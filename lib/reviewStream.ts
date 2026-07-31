@@ -1,4 +1,4 @@
-import type { ContentType, StreamEvent } from "@/lib/types";
+import type { ContentType, StreamEvent, FollowupStreamEvent } from "@/lib/types";
 
 export interface ReviewStreamInput {
   clientId: string;
@@ -6,17 +6,7 @@ export interface ReviewStreamInput {
   originalText: string;
 }
 
-export async function* streamReview(
-  input: ReviewStreamInput,
-  signal?: AbortSignal,
-): AsyncGenerator<StreamEvent> {
-  const response = await fetch("/api/review", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-    signal,
-  });
-
+async function* streamNdjson<T>(response: Response): AsyncGenerator<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     throw new Error(body?.error ?? `Request failed with status ${response.status}`);
@@ -39,11 +29,40 @@ export async function* streamReview(
 
     for (const line of lines) {
       if (!line.trim()) continue;
-      yield JSON.parse(line) as StreamEvent;
+      yield JSON.parse(line) as T;
     }
   }
 
   if (buffer.trim()) {
-    yield JSON.parse(buffer) as StreamEvent;
+    yield JSON.parse(buffer) as T;
   }
+}
+
+export async function* streamReview(
+  input: ReviewStreamInput,
+  signal?: AbortSignal,
+): AsyncGenerator<StreamEvent> {
+  const response = await fetch("/api/review", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    signal,
+  });
+
+  yield* streamNdjson<StreamEvent>(response);
+}
+
+export async function* streamFollowup(
+  reviewId: string,
+  content: string,
+  signal?: AbortSignal,
+): AsyncGenerator<FollowupStreamEvent> {
+  const response = await fetch(`/api/reviews/${reviewId}/messages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+    signal,
+  });
+
+  yield* streamNdjson<FollowupStreamEvent>(response);
 }

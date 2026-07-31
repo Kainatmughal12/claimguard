@@ -31,18 +31,28 @@ separable — this is a deliberate decision to defend in review.
 
 ```
 /app
-  page.tsx              review workspace (main screen)
-  /history/page.tsx     past reviews
-  /rules/page.tsx       browsable rule pack
-  /api/review/route.ts  POST — runs agent, streams progress
-  /api/reviews/route.ts GET  — review history
+  page.tsx                        new/active conversation (hero + composer, or the thread)
+  /review/[id]/page.tsx           hydrate and continue a past conversation
+  /history/page.tsx               past reviews, links into /review/[id]
+  /rules/page.tsx                 browsable rule pack
+  /api/review/route.ts            POST — starts a thread: runs agent, streams progress
+  /api/reviews/route.ts           GET  — review history list
+  /api/reviews/[id]/route.ts      GET  — hydrate a full thread (review + findings + messages)
+  /api/reviews/[id]/messages/route.ts  POST — follow-up chat turn, token-streamed
 /agent
-  graph.ts              createDeepAgent(...) configuration
-  prompts.ts            system prompts (main agent + rewriter sub-agent)
-  /tools                one file per tool
+  graph.ts               createDeepAgent(...) configuration
+  model.ts                exported model client (also used directly for follow-ups)
+  prompts.ts              system prompts (main agent, rewriter sub-agent, follow-up chat)
+  buildReviewMessage.ts    builds the turn-1 review prompt
+  buildFollowupMessage.ts  builds a follow-up turn's context + prompt
+  /tools                  one file per tool
+/components
+  /chat                  chat-shell, composer, hero, message-list, assistant-turn,
+                          rewrite-block, selector-chips, suggestion-chips, sidebar
 /lib
-  supabase.ts           client
-  types.ts              shared types
+  supabase.ts            client
+  types.ts               shared types
+  reviewStream.ts         NDJSON stream parsing (review + follow-up)
 /supabase
   schema.sql
   seed.sql
@@ -93,6 +103,18 @@ create table findings (
   severity text not null,
   explanation text not null,
   suggested_fix text
+);
+
+-- Follow-up conversation turns only (turn 3+). The first exchange — the
+-- original submission and the structured review — is synthesized in the UI
+-- from reviews/findings above, not duplicated here. A review row is the
+-- conversation thread anchor; there is no separate threads table.
+create table messages (
+  id uuid primary key default gen_random_uuid(),
+  review_id uuid references reviews(id) on delete cascade,
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  created_at timestamptz default now()
 );
 ```
 
@@ -163,19 +185,45 @@ saveReview(review: ReviewInput, findings: FindingInput[])
   than crashing.
 - The product suggests; it never auto-publishes. Human stays in the loop.
 
+### Follow-up conversation turns
+
+Once a review exists, the user can keep asking questions in the same thread
+("why does this violate CLAIM-004", "make the rewrite shorter") without
+re-running the full compliance-scan agent. Follow-ups call `model` (from
+`agent/model.ts`) directly with no tools and no deepagents graph — grounded in
+the stored client profile, original text, findings, and current rewrite via
+`buildFollowupMessage.ts`. This keeps Gemini free-tier rate-limit exposure flat
+as conversations grow, and — because it has no tool calls — it can use real
+token-by-token streaming, unlike the turn-1 review path (see Known failure
+modes). The follow-up prompt must not introduce new rule citations beyond what
+was already found; it explains, discusses, or revises copy using the given
+context, never invents new compliance findings outside `flagViolation`.
+
 ## UI
 
-Single main screen, three regions:
-- Left: client selector, content-type selector, textarea, Review button
-- Centre: original text with flagged spans highlighted by severity, clickable
-- Right: findings cards (rule ID, authority, explanation, suggested fix), then
-  the rewrite with copy-to-clipboard
+Chat-first: the AI conversation is the product, not a form. One thread per
+review; the initial submission and its structured result are turn 1 and turn 2,
+after which the user can keep chatting in the same thread.
+
+- Empty state: hero intro + a large message composer (auto-growing textarea,
+  Enter to submit, Shift+Enter for newline). Client and content-type are
+  floating chips above the composer, required before first submit. Suggestion
+  chips populate the composer with example drafts.
+- Once submitted, the layout becomes a message list: the user's draft as a
+  turn, then the assistant's turn — animated progress steps while the agent
+  runs, then the verdict, findings as expandable cards (rule ID, authority,
+  explanation, suggested fix), and the rewrite in an editor-style block (copy,
+  edit, replace original, export, continue).
+- After turn 1, the composer switches to a plain follow-up chat input, and
+  further assistant turns stream token-by-token.
+- Slim collapsible sidebar (icon-rail when collapsed): New Review, Review
+  History, Rules. No large permanent dashboard chrome.
 
 shadcn components: select, textarea, button, badge, card, tabs, skeleton,
-separator, scroll-area.
+separator, scroll-area, sheet, popover, command, accordion, tooltip, sidebar.
 
-Stream agent progress to the UI ("retrieved 14 rules… found 3 issues…"). Never
-show a bare spinner for a multi-second agent run.
+Never show a bare spinner for a multi-second agent run — progress steps or
+streamed tokens instead.
 
 Handle loading, empty, and error states on every screen. A reviewer will click
 into a blank state and it should look intentional.
@@ -209,6 +257,14 @@ Follow this sequence. Do not jump ahead.
 - Rewrite drifting off-brand → pass brand tone explicitly, show side by side
 - Rule staleness → rules live in the DB, not the prompt
 - Latency → stream progress; note rule-lookup caching as future work
+- Rate limits multiplying with conversation length → follow-up turns use a
+  single tool-free model call grounded in stored context instead of a full
+  agent re-run, keeping Gemini call volume roughly flat per turn regardless of
+  thread length
+- Token streaming breaking tool-calling → only the tool-free follow-up path
+  streams tokens; the turn-1 review path (which does call tools) keeps the
+  existing step-progress streaming, since token streaming is documented as
+  unreliable there
 
 ## Working style
 

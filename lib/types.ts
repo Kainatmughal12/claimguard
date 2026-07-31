@@ -72,3 +72,28 @@ export type StreamEvent =
   | { type: "progress"; message: string }
   | { type: "done"; reviewId: string; review: ReviewRecord; findings: FindingRecord[] }
   | { type: "error"; message: string };
+
+export type MessageRole = "user" | "assistant";
+
+export interface ChatMessage {
+  id: string;
+  review_id: string;
+  role: MessageRole;
+  content: string;
+  created_at: string;
+}
+
+export interface ThreadSummary {
+  id: string;
+  client_name: string;
+  content_type: ContentType;
+  overall_risk: OverallRisk | null;
+  created_at: string;
+  snippet: string;
+}
+
+export type FollowupStreamEvent =
+  | { type: "status"; message: string }
+  | { type: "token"; value: string }
+  | { type: "done"; message: ChatMessage }
+  | { type: "error"; message: string };

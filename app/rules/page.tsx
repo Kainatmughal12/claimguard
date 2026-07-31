@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
   Card,
@@ -24,22 +23,6 @@ const SEVERITY_VARIANT = {
 // data" instead of the page just rendering normally at request time.
 export const dynamic = "force-dynamic";
 
-function SiteNav() {
-  return (
-    <header className="flex items-center justify-between border-b px-6 py-3">
-      <h1 className="text-sm font-medium">ClaimGuard</h1>
-      <nav className="flex gap-4 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Review
-        </Link>
-        <Link href="/rules" className="text-foreground">
-          Rules
-        </Link>
-      </nav>
-    </header>
-  );
-}
-
 export default async function RulesPage() {
   let rules: ComplianceRule[] | null = null;
   let errorMessage: string | null = null;
@@ -62,29 +45,21 @@ export default async function RulesPage() {
 
   if (errorMessage) {
     return (
-      <>
-        <SiteNav />
-        <main className="mx-auto max-w-3xl p-8">
-          <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
-          <p className="mt-4 text-destructive">
-            Couldn&apos;t load rules: {errorMessage}
-          </p>
-        </main>
-      </>
+      <main className="mx-auto max-w-3xl p-8">
+        <h1 className="text-2xl font-semibold tracking-tight">Compliance rule pack</h1>
+        <p className="mt-4 text-sm text-destructive">Couldn&apos;t load rules: {errorMessage}</p>
+      </main>
     );
   }
 
   if (!rules || rules.length === 0) {
     return (
-      <>
-        <SiteNav />
-        <main className="mx-auto max-w-3xl p-8">
-          <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
-          <p className="mt-4 text-muted-foreground">
-            No rules found. Has supabase/seed.sql been applied yet?
-          </p>
-        </main>
-      </>
+      <main className="mx-auto max-w-3xl p-8">
+        <h1 className="text-2xl font-semibold tracking-tight">Compliance rule pack</h1>
+        <p className="mt-4 text-sm text-muted-foreground">
+          No rules found. Has supabase/seed.sql been applied yet?
+        </p>
+      </main>
     );
   }
 
@@ -96,29 +71,29 @@ export default async function RulesPage() {
   }
 
   return (
-    <>
-      <SiteNav />
-      <main className="mx-auto max-w-3xl space-y-10 p-8">
+    <main className="mx-auto max-w-3xl space-y-10 px-6 py-10">
       <div>
-        <h1 className="text-2xl font-semibold">Compliance rule pack</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          A simplified, plain-English rule pack for a prototype — not legal
-          advice, and not a complete compliance reference.
+        <h1 className="text-2xl font-semibold tracking-tight">Compliance rule pack</h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          A simplified, plain-English rule pack for a prototype — not legal advice, and not a
+          complete compliance reference. {rules.length} rules across {byCategory.size} categories.
         </p>
       </div>
 
       {[...byCategory.entries()].map(([category, categoryRules]) => (
         <section key={category} className="space-y-4">
-          <h2 className="text-lg font-medium">{category}</h2>
+          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            {category}
+          </h2>
           <Separator />
-          <div className="space-y-4">
+          <div className="space-y-3">
             {categoryRules.map((rule) => (
-              <Card key={rule.id}>
+              <Card key={rule.id} className="bg-card/50">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <CardTitle>{rule.title}</CardTitle>
-                      <CardDescription>
+                      <CardDescription className="font-mono text-xs">
                         {rule.id} · {rule.authority}
                       </CardDescription>
                     </div>
@@ -127,20 +102,17 @@ export default async function RulesPage() {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm">
+                <CardContent className="space-y-3 text-sm leading-relaxed">
                   <p>{rule.plain_english_rule}</p>
                   {rule.example_violation && (
                     <p className="text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        Violation:
-                      </span>{" "}
+                      <span className="font-medium text-foreground">Violation:</span>{" "}
                       {rule.example_violation}
                     </p>
                   )}
                   {rule.example_fix && (
                     <p className="text-muted-foreground">
-                      <span className="font-medium text-foreground">Fix:</span>{" "}
-                      {rule.example_fix}
+                      <span className="font-medium text-foreground">Fix:</span> {rule.example_fix}
                     </p>
                   )}
                 </CardContent>
@@ -149,7 +121,6 @@ export default async function RulesPage() {
           </div>
         </section>
       ))}
-      </main>
-    </>
+    </main>
   );
 }

@@ -40,13 +40,25 @@ create table findings (
   suggested_fix text
 );
 
+-- Follow-up conversation turns only (turn 3+). The first exchange — the
+-- original submission and the structured review — is synthesized in the UI
+-- from the reviews/findings rows above, not duplicated here.
+create table messages (
+  id uuid primary key default gen_random_uuid(),
+  review_id uuid references reviews(id) on delete cascade,
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  created_at timestamptz default now()
+);
+
 -- Row Level Security: compliance_rules is public reference data (anon read,
--- powers /rules). clients/reviews/findings are server-only — no anon
+-- powers /rules). clients/reviews/findings/messages are server-only — no anon
 -- policies, so only the service-role key (which bypasses RLS) can touch them.
 alter table clients enable row level security;
 alter table compliance_rules enable row level security;
 alter table reviews enable row level security;
 alter table findings enable row level security;
+alter table messages enable row level security;
 
 create policy "Public read access to compliance rules"
   on compliance_rules for select

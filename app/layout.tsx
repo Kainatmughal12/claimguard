@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/chat/sidebar";
+import { TopNav } from "@/components/top-nav";
+import { getThreadSummaries } from "@/lib/reviews";
 import "./globals.css";
+
+export const dynamic = "force-dynamic";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,17 +24,29 @@ export const metadata: Metadata = {
   description: "Healthcare marketing compliance review, powered by AI. Not legal advice.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const recentThreads = await getThreadSummaries(5).catch(() => []);
+
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <TooltipProvider delay={200}>
+          <SidebarProvider>
+            <AppSidebar recentThreads={recentThreads} />
+            <SidebarInset>
+              <TopNav />
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
+        </TooltipProvider>
+      </body>
     </html>
   );
 }

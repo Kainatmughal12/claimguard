@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckIcon, LoaderCircleIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProgressLogProps {
   messages: string[];
@@ -18,8 +21,9 @@ export function ProgressLog({ messages, collapsed = false, elapsedSeconds }: Pro
       <button
         type="button"
         onClick={() => setExpanded(true)}
-        className="text-left text-xs text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
       >
+        <CheckIcon className="size-3 text-severity-pass" />
         Reviewed in {elapsedSeconds ?? 0}s — {messages.length} step
         {messages.length === 1 ? "" : "s"}
       </button>
@@ -27,24 +31,31 @@ export function ProgressLog({ messages, collapsed = false, elapsedSeconds }: Pro
   }
 
   return (
-    <ul className="space-y-1 text-sm">
-      {messages.map((message, i) => {
-        const isLast = i === messages.length - 1;
-        const done = collapsed || !isLast;
-        return (
-          <li
-            key={i}
-            className={done ? "text-muted-foreground" : "text-foreground"}
-          >
-            {done && (
-              <span aria-hidden className="select-none">
-                ✓{" "}
+    <ul className="space-y-1.5 text-sm">
+      <AnimatePresence initial={false}>
+        {messages.map((message, i) => {
+          const isLast = i === messages.length - 1;
+          const done = collapsed || !isLast;
+          return (
+            <motion.li
+              key={i}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className={cn("flex items-start gap-2", done ? "text-muted-foreground" : "text-foreground")}
+            >
+              <span className="mt-0.5 shrink-0" aria-hidden>
+                {done ? (
+                  <CheckIcon className="size-3.5 text-severity-pass" />
+                ) : (
+                  <LoaderCircleIcon className="size-3.5 animate-spin text-primary" />
+                )}
               </span>
-            )}
-            {message}
-          </li>
-        );
-      })}
+              <span>{message}</span>
+            </motion.li>
+          );
+        })}
+      </AnimatePresence>
       {collapsed && (
         <li>
           <button
