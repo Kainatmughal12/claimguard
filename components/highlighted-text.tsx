@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { SEVERITY_HIGHLIGHT_CLASS } from "@/lib/severity";
+import { SEVERITY_HIGHLIGHT_CLASS, SEVERITY_UNDERLINE_CLASS } from "@/lib/severity";
 import type { FindingRecord } from "@/lib/types";
 
 interface HighlightedTextProps {
@@ -67,10 +67,19 @@ export function HighlightedText({
           <mark
             key={i}
             id={`span-${segment.finding.id}`}
+            tabIndex={0}
+            role="button"
             onClick={() => onSelectFinding(segment.finding!.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelectFinding(segment.finding!.id);
+              }
+            }}
             className={cn(
-              "cursor-pointer rounded-sm px-0.5 text-foreground transition-colors",
+              "cursor-pointer rounded-sm px-0.5 text-foreground underline decoration-1 underline-offset-2 transition-colors hover:brightness-95 dark:hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               SEVERITY_HIGHLIGHT_CLASS[segment.finding.severity],
+              SEVERITY_UNDERLINE_CLASS[segment.finding.severity],
               activeFindingId === segment.finding.id && "ring-1 ring-ring",
             )}
           >

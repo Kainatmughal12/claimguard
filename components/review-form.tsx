@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -19,14 +21,16 @@ const CONTENT_TYPES: { value: ContentType; label: string }[] = [
   { value: "email", label: "Email" },
 ];
 
-const EXAMPLE_DRAFTS: { label: string; contentType: ContentType; text: string }[] = [
+const EXAMPLE_DRAFTS: { label: string; description: string; contentType: ContentType; text: string }[] = [
   {
     label: "Clean example",
+    description: "A straightforward, compliant post.",
     contentType: "social_post",
     text: "New patient special this month — book your first cleaning and exam with us today!",
   },
   {
     label: "Flagrant example",
+    description: "Guarantees, unsourced stats, and absolute safety claims.",
     contentType: "ad_copy",
     text: "Guaranteed to whiten your teeth in just 3 days — 100% safe, no risk, and clinically proven! Join thousands of happy patients.",
   },
@@ -108,26 +112,39 @@ export function ReviewForm({
       </div>
 
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-medium text-muted-foreground">Draft</label>
-          <div className="flex gap-3">
-            {EXAMPLE_DRAFTS.map((example) => (
-              <Button
-                key={example.label}
-                type="button"
-                variant="link"
-                size="xs"
-                className="h-auto p-0 font-normal text-xs"
-                disabled={isStreaming}
-                onClick={() => {
+        <label className="text-xs font-medium text-muted-foreground">Draft</label>
+        <div className="grid grid-cols-2 gap-2">
+          {EXAMPLE_DRAFTS.map((example) => (
+            <Card
+              key={example.label}
+              size="sm"
+              tabIndex={isStreaming ? -1 : 0}
+              role="button"
+              aria-disabled={isStreaming}
+              onClick={() => {
+                if (isStreaming) return;
+                setText(example.text);
+                setContentType(example.contentType);
+              }}
+              onKeyDown={(e) => {
+                if (isStreaming) return;
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
                   setText(example.text);
                   setContentType(example.contentType);
-                }}
-              >
-                {example.label}
-              </Button>
-            ))}
-          </div>
+                }
+              }}
+              className={cn(
+                "cursor-pointer transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                isStreaming && "pointer-events-none opacity-50",
+              )}
+            >
+              <CardContent className="space-y-0.5">
+                <p className="text-xs font-medium">{example.label}</p>
+                <p className="text-xs text-muted-foreground">{example.description}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
         <Textarea
           value={text}

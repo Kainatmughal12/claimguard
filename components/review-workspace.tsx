@@ -1,11 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
 import { OriginalRewriteView, type ViewMode } from "@/components/original-rewrite-view";
 import { FindingsPanel } from "@/components/findings-panel";
 import { ProgressLog } from "@/components/progress-log";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { streamReview } from "@/lib/reviewStream";
 import type { Client, ContentType, FindingRecord, ReviewRecord } from "@/lib/types";
 
@@ -25,7 +27,9 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("original");
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const streamStartedAtRef = useRef<number>(0);
 
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
@@ -47,6 +51,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
     setActiveFindingId(null);
     setViewMode("original");
     setSubmittedText(input.originalText);
+    streamStartedAtRef.current = Date.now();
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -58,6 +63,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
         } else if (event.type === "done") {
           setReview(event.review);
           setFindings(event.findings);
+          setElapsedSeconds(Math.round((Date.now() - streamStartedAtRef.current) / 1000));
           setStatus("done");
         } else if (event.type === "error") {
           setErrorMessage(event.message);
@@ -103,7 +109,19 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
 
         <div className={submittedText === null ? "min-w-0 self-start rounded-lg border p-4" : "min-w-0 rounded-lg border p-4"}>
           {submittedText === null ? (
-            <p className="text-sm text-muted-foreground">Your draft will appear here.</p>
+            <div className="space-y-3">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Paste a client&apos;s draft marketing copy and ClaimGuard flags
+                compliance risks, cites the rule, and drafts a compliant rewrite.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Reviews are checked against 27 rules across 7 categories —{" "}
+                <Link href="/rules" className="underline underline-offset-2 hover:text-foreground">
+                  browse the rule pack
+                </Link>
+                .
+              </p>
+            </div>
           ) : (
             <OriginalRewriteView
               text={submittedText}
@@ -117,29 +135,36 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
           )}
         </div>
 
-        <div className="min-w-0">
-          {status === "streaming" && (
-            <div className="space-y-4">
-              <ProgressLog messages={progress} />
-              <div className="space-y-2">
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-20 w-full" />
+        <ScrollArea className="min-w-0 h-[calc(100vh-10rem)]">
+          <div className="pr-3">
+            {status === "streaming" && (
+              <div className="space-y-4">
+                <ProgressLog messages={progress} />
+                <div className="space-y-2">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
               </div>
-            </div>
-          )}
-          {status === "error" && <p className="text-sm text-destructive">{errorMessage}</p>}
-          {status === "done" && review && (
-            <FindingsPanel
-              review={review}
-              findings={findings}
-              activeFindingId={activeFindingId}
-              onSelectFinding={selectFindingFromPanel}
-            />
-          )}
-          {status === "idle" && submittedText === null && (
-            <p className="text-sm text-muted-foreground">Findings will appear here.</p>
-          )}
-        </div>
+            )}
+            {status === "error" && <p className="text-sm text-destructive">{errorMessage}</p>}
+            {status === "done" && review && (
+              <div className="space-y-4">
+                <ProgressLog messages={progress} collapsed elapsedSeconds={elapsedSeconds} />
+                <FindingsPanel
+                  review={review}
+                  findings={findings}
+                  activeFindingId={activeFindingId}
+                  onSelectFinding={selectFindingFromPanel}
+                />
+              </div>
+            )}
+            {status === "idle" && submittedText === null && (
+              <p className="text-sm text-muted-foreground">
+                Findings and a compliant rewrite will appear here once you run a review.
+              </p>
+            )}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );

@@ -21,6 +21,18 @@ export const SEVERITY_HIGHLIGHT_CLASS: Record<Severity, string> = {
   low: "bg-severity-low/15 dark:bg-severity-low/25",
 };
 
+export const SEVERITY_BORDER_CLASS: Record<Severity, string> = {
+  high: "border-severity-high",
+  medium: "border-severity-medium",
+  low: "border-severity-low",
+};
+
+export const SEVERITY_UNDERLINE_CLASS: Record<Severity, string> = {
+  high: "decoration-severity-high",
+  medium: "decoration-severity-medium",
+  low: "decoration-severity-low",
+};
+
 // Overall risk reuses the same severity color system: high_risk maps to the
 // same red as a high-severity finding, needs_revision to the medium amber,
 // and pass to the color reserved for the all-clear state.
