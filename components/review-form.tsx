@@ -35,12 +35,20 @@ const EXAMPLE_DRAFTS: { label: string; contentType: ContentType; text: string }[
 interface ReviewFormProps {
   clients: Client[];
   status: "idle" | "streaming" | "done" | "error";
+  clientId: string | null;
+  onClientIdChange: (clientId: string | null) => void;
   onSubmit: (input: { clientId: string; contentType: ContentType; originalText: string }) => void;
   onCancel: () => void;
 }
 
-export function ReviewForm({ clients, status, onSubmit, onCancel }: ReviewFormProps) {
-  const [clientId, setClientId] = useState<string | null>(null);
+export function ReviewForm({
+  clients,
+  status,
+  clientId,
+  onClientIdChange,
+  onSubmit,
+  onCancel,
+}: ReviewFormProps) {
   const [contentType, setContentType] = useState<ContentType | null>(null);
   const [text, setText] = useState("");
 
@@ -51,7 +59,7 @@ export function ReviewForm({ clients, status, onSubmit, onCancel }: ReviewFormPr
     <div className="space-y-3">
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-muted-foreground">Client</label>
-        <Select value={clientId} onValueChange={setClientId} disabled={isStreaming}>
+        <Select value={clientId} onValueChange={onClientIdChange} disabled={isStreaming}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a client">
               {(value: string | null) => {

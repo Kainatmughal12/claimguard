@@ -1,17 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import {
-  OVERALL_RISK_BADGE_CLASS,
-  OVERALL_RISK_LABEL,
-  SEVERITY_BADGE_CLASS,
-  SEVERITY_LABEL,
-} from "@/lib/severity";
+import { SEVERITY_BADGE_CLASS, SEVERITY_LABEL } from "@/lib/severity";
+import { VerdictBlock } from "@/components/verdict-block";
 import type { FindingRecord, ReviewRecord } from "@/lib/types";
 
 interface FindingsPanelProps {
@@ -27,15 +20,6 @@ export function FindingsPanel({
   activeFindingId,
   onSelectFinding,
 }: FindingsPanelProps) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    if (!review.rewritten_text) return;
-    await navigator.clipboard.writeText(review.rewritten_text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
   function selectFinding(id: string) {
     onSelectFinding(id);
     document.getElementById(`span-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -43,28 +27,14 @@ export function FindingsPanel({
 
   return (
     <div className="space-y-4">
-      <Badge
-        className={cn(
-          "h-7 rounded-full px-3 text-sm font-semibold",
-          OVERALL_RISK_BADGE_CLASS[review.overall_risk],
-        )}
-      >
-        {OVERALL_RISK_LABEL[review.overall_risk]}
-      </Badge>
+      <VerdictBlock review={review} findings={findings} />
 
-      <div>
-        <h2 className="text-sm font-medium text-muted-foreground">
-          {findings.length === 0 ? "Findings" : `Findings (${findings.length})`}
-        </h2>
+      {findings.length > 0 && (
+        <div>
+          <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Findings ({findings.length})
+          </h2>
 
-        {findings.length === 0 ? (
-          <Card size="sm" className="mt-2 ring-severity-pass/30">
-            <CardContent>
-              <p className="text-sm font-medium text-severity-pass">No issues found.</p>
-              <p className="mt-1 text-sm text-muted-foreground">{review.agent_summary}</p>
-            </CardContent>
-          </Card>
-        ) : (
           <div className="mt-2 space-y-2">
             {findings.map((finding) => (
               <Card
@@ -100,23 +70,6 @@ export function FindingsPanel({
               </Card>
             ))}
           </div>
-        )}
-      </div>
-
-      {review.rewritten_text && (
-        <div>
-          <Separator className="my-4" />
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-muted-foreground">Rewrite</h2>
-            <Button size="sm" variant="outline" onClick={handleCopy}>
-              {copied ? "Copied" : "Copy"}
-            </Button>
-          </div>
-          <Card size="sm" className="mt-2">
-            <CardContent>
-              <p className="whitespace-pre-wrap text-sm">{review.rewritten_text}</p>
-            </CardContent>
-          </Card>
         </div>
       )}
     </div>

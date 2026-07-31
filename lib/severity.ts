@@ -35,3 +35,15 @@ export const OVERALL_RISK_BADGE_CLASS: Record<OverallRisk, string> = {
   needs_revision: "bg-severity-medium/10 text-severity-medium dark:bg-severity-medium/20",
   pass: "bg-severity-pass/10 text-severity-pass dark:bg-severity-pass/20",
 };
+
+export const OVERALL_RISK_TEXT_CLASS: Record<OverallRisk, string> = {
+  high_risk: "text-severity-high",
+  needs_revision: "text-severity-medium",
+  pass: "text-severity-pass",
+};
+
+export const OVERALL_RISK_BORDER_CLASS: Record<OverallRisk, string> = {
+  high_risk: "border-severity-high",
+  needs_revision: "border-severity-medium",
+  pass: "border-severity-pass",
+};

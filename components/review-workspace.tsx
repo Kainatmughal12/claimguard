@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ReviewForm } from "@/components/review-form";
-import { HighlightedText } from "@/components/highlighted-text";
+import { OriginalRewriteView, type ViewMode } from "@/components/original-rewrite-view";
 import { FindingsPanel } from "@/components/findings-panel";
 import { ProgressLog } from "@/components/progress-log";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +16,7 @@ interface ReviewWorkspaceProps {
 }
 
 export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
+  const [clientId, setClientId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [progress, setProgress] = useState<string[]>([]);
   const [submittedText, setSubmittedText] = useState<string | null>(null);
@@ -23,7 +24,15 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
   const [findings, setFindings] = useState<FindingRecord[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("original");
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const selectedClient = clients.find((c) => c.id === clientId) ?? null;
+
+  function selectFindingFromPanel(id: string) {
+    setViewMode("original");
+    setActiveFindingId(id);
+  }
 
   async function handleSubmit(input: {
     clientId: string;
@@ -36,6 +45,7 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
     setFindings([]);
     setErrorMessage(null);
     setActiveFindingId(null);
+    setViewMode("original");
     setSubmittedText(input.originalText);
 
     const controller = new AbortController();
@@ -70,51 +80,66 @@ export function ReviewWorkspace({ clients }: ReviewWorkspaceProps) {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-4 p-6 lg:grid-cols-[320px_1fr_360px]">
-      <div>
-        <ReviewForm
-          clients={clients}
-          status={status}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-        />
-      </div>
+    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 p-6">
+      {selectedClient && (
+        <p className="text-xs text-muted-foreground">
+          {[selectedClient.name, selectedClient.specialty, selectedClient.state, selectedClient.brandTone]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      )}
 
-      <div className={submittedText === null ? "min-w-0 self-start rounded-lg border p-4" : "min-w-0 rounded-lg border p-4"}>
-        {submittedText === null ? (
-          <p className="text-sm text-muted-foreground">Your draft will appear here.</p>
-        ) : (
-          <HighlightedText
-            text={submittedText}
-            findings={findings}
-            activeFindingId={activeFindingId}
-            onSelectFinding={setActiveFindingId}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr_360px]">
+        <div>
+          <ReviewForm
+            clients={clients}
+            status={status}
+            clientId={clientId}
+            onClientIdChange={setClientId}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
           />
-        )}
-      </div>
+        </div>
 
-      <div className="min-w-0">
-        {status === "streaming" && (
-          <div className="space-y-4">
-            <ProgressLog messages={progress} />
-            <div className="space-y-2">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
+        <div className={submittedText === null ? "min-w-0 self-start rounded-lg border p-4" : "min-w-0 rounded-lg border p-4"}>
+          {submittedText === null ? (
+            <p className="text-sm text-muted-foreground">Your draft will appear here.</p>
+          ) : (
+            <OriginalRewriteView
+              text={submittedText}
+              review={review}
+              findings={findings}
+              activeFindingId={activeFindingId}
+              onSelectFinding={setActiveFindingId}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
+          )}
+        </div>
+
+        <div className="min-w-0">
+          {status === "streaming" && (
+            <div className="space-y-4">
+              <ProgressLog messages={progress} />
+              <div className="space-y-2">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
             </div>
-          </div>
-        )}
-        {status === "error" && <p className="text-sm text-destructive">{errorMessage}</p>}
-        {status === "done" && review && (
-          <FindingsPanel
-            review={review}
-            findings={findings}
-            activeFindingId={activeFindingId}
-            onSelectFinding={setActiveFindingId}
-          />
-        )}
-        {status === "idle" && submittedText === null && (
-          <p className="text-sm text-muted-foreground">Findings will appear here.</p>
-        )}
+          )}
+          {status === "error" && <p className="text-sm text-destructive">{errorMessage}</p>}
+          {status === "done" && review && (
+            <FindingsPanel
+              review={review}
+              findings={findings}
+              activeFindingId={activeFindingId}
+              onSelectFinding={selectFindingFromPanel}
+            />
+          )}
+          {status === "idle" && submittedText === null && (
+            <p className="text-sm text-muted-foreground">Findings will appear here.</p>
+          )}
+        </div>
       </div>
     </div>
   );
