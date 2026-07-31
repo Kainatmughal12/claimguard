@@ -81,6 +81,10 @@ claim.
 - needs_revision — one or more medium or low findings, no high ones.
 - pass — no findings.
 
+These three values are for the overall_risk field only. In agent_summary,
+describe the risk in plain English ("this needs revision before it can
+publish") — never echo the raw field value ("needs_revision") in prose.
+
 ## What you are not
 
 You are not a lawyer and this is not legal advice. Your rule pack is a

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/chat/sidebar";
@@ -19,6 +19,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Display face reserved for headline moments (hero, verdict) — a serif with
+// editorial/regulatory gravitas, deliberately distinct from the sans used
+// for interface chrome, so the "verdict" of a review reads as a judgment
+// rendered, not another UI label.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["opsz", "SOFT", "WONK"],
+});
+
 export const metadata: Metadata = {
   title: "ClaimGuard",
   description: "Healthcare marketing compliance review, powered by AI. Not legal advice.",
@@ -34,7 +44,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <TooltipProvider delay={200}>

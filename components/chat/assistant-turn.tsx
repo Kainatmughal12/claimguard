@@ -7,14 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProgressLog } from "@/components/progress-log";
 import { RewriteBlock } from "@/components/chat/rewrite-block";
+import { VerdictStamp } from "@/components/chat/verdict-stamp";
 import { cn } from "@/lib/utils";
-import {
-  OVERALL_RISK_BADGE_CLASS,
-  OVERALL_RISK_LABEL,
-  SEVERITY_BADGE_CLASS,
-  SEVERITY_BORDER_CLASS,
-  SEVERITY_LABEL,
-} from "@/lib/severity";
+import { SEVERITY_BADGE_CLASS, SEVERITY_BORDER_CLASS, SEVERITY_LABEL } from "@/lib/severity";
 import type { FindingRecord, ReviewRecord } from "@/lib/types";
 
 interface AssistantTurnProps {
@@ -63,6 +58,11 @@ export function AssistantTurn({
 
   return (
     <div className="max-w-2xl space-y-4 rounded-2xl border border-border/60 bg-card/50 p-4">
+      <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+        <span className="text-[0.65rem] font-medium tracking-[0.16em] text-muted-foreground/70 uppercase">
+          Compliance review
+        </span>
+      </div>
       <ProgressLog messages={progress} collapsed={status === "done"} elapsedSeconds={elapsedSeconds} />
 
       {status === "error" && (
@@ -76,18 +76,16 @@ export function AssistantTurn({
           transition={{ duration: 0.3 }}
           className="space-y-4"
         >
-          <div className="border-l-4 border-primary/40 py-1 pl-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className={OVERALL_RISK_BADGE_CLASS[review.overall_risk]}>
-                {OVERALL_RISK_LABEL[review.overall_risk]}
-              </Badge>
+          <div className="flex items-start gap-4">
+            <VerdictStamp risk={review.overall_risk} delay={0.15} />
+            <div className="min-w-0 flex-1 pt-1.5">
               {findings.length > 0 && (
-                <span className="text-xs text-muted-foreground">
+                <p className="text-xs tracking-wide text-muted-foreground uppercase">
                   {findings.length} issue{findings.length === 1 ? "" : "s"} found
-                </span>
+                </p>
               )}
+              <p className="mt-1 text-sm leading-relaxed">{review.agent_summary}</p>
             </div>
-            <p className="mt-2 text-sm leading-relaxed">{review.agent_summary}</p>
           </div>
 
           {findings.length > 0 && (

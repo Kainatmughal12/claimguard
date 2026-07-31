@@ -6,8 +6,8 @@ export function Hero() {
       <div className="flex size-12 items-center justify-center rounded-2xl bg-[image:var(--accent-gradient)] shadow-lg shadow-primary/20">
         <ShieldCheckIcon className="size-6 text-primary-foreground" />
       </div>
-      <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Ask ClaimGuard to review your copy
+      <h1 className="font-heading text-3xl leading-tight font-medium tracking-tight sm:text-4xl">
+        Ask ClaimGuard to <em className="text-primary italic">review</em> your copy
       </h1>
       <p className="max-w-lg text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
         Paste a draft — a social post, an ad, a blog section, an email — and ClaimGuard
