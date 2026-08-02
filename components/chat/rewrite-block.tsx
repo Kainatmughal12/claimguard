@@ -49,7 +49,7 @@ export function RewriteBlock({ text, onReplaceOriginal, onContinue }: RewriteBlo
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-muted/30">
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-card/70">
       <div className="flex items-center justify-between border-b border-border/70 bg-muted/40 px-3 py-2">
         <p className="font-mono text-xs font-medium text-muted-foreground">Compliant rewrite</p>
         <div className="flex items-center gap-1">
@@ -65,16 +65,16 @@ export function RewriteBlock({ text, onReplaceOriginal, onContinue }: RewriteBlo
         </div>
       </div>
 
-      <div className="p-3">
+      <div className="px-5 py-4">
         {editing ? (
           <Textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             rows={6}
-            className="text-sm leading-relaxed"
+            className="font-serif text-base leading-7"
           />
         ) : (
-          <p className="whitespace-pre-wrap text-sm leading-relaxed">{currentText}</p>
+          <p className="max-w-[70ch] whitespace-pre-wrap font-serif text-base leading-7">{currentText}</p>
         )}
       </div>
 

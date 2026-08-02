@@ -26,24 +26,20 @@ export function VerdictStamp({ risk, delay = 0 }: VerdictStampProps) {
 
   return (
     <motion.div
-      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.6, rotate: 0 }}
-      animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, rotate: angle }}
-      transition={
-        reduceMotion
-          ? { duration: 0.2, delay }
-          : { type: "spring", stiffness: 260, damping: 14, mass: 0.9, delay }
-      }
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: reduceMotion ? 0.2 : 0.3, delay }}
       className={cn(
         "inline-flex shrink-0 flex-col items-center gap-0.5 rounded-md border-[3px] px-4 py-1.5",
         "before:pointer-events-none before:absolute before:inset-[3px] before:rounded-[3px] before:border before:border-current before:opacity-40",
         "relative select-none",
         OVERALL_RISK_BORDER_CLASS[risk],
       )}
-      style={{ transformOrigin: "center" }}
+      style={{ transform: `rotate(${angle}deg)`, transformOrigin: "center" }}
     >
       <span
         className={cn(
-          "font-heading text-lg leading-none font-semibold tracking-[0.14em] uppercase italic",
+          "text-lg leading-none font-semibold tracking-[0.14em] uppercase",
           OVERALL_RISK_TEXT_CLASS[risk],
         )}
       >

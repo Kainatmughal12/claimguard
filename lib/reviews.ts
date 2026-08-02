@@ -4,7 +4,7 @@ import type { ThreadSummary, ReviewRecord, FindingRecord, ChatMessage, Client } 
 export async function getThreadSummaries(limit?: number): Promise<ThreadSummary[]> {
   let query = supabaseAdmin
     .from("reviews")
-    .select("id, content_type, overall_risk, original_text, created_at, clients(name)")
+    .select("id, content_type, overall_risk, original_text, created_at, clients(name), findings(count)")
     .order("created_at", { ascending: false });
 
   if (limit) query = query.limit(limit);
@@ -14,6 +14,7 @@ export async function getThreadSummaries(limit?: number): Promise<ThreadSummary[
 
   return (data ?? []).map((row) => {
     const client = row.clients as unknown as { name: string } | null;
+    const findingCount = row.findings as unknown as { count: number }[] | null;
     return {
       id: row.id,
       client_name: client?.name ?? "Unknown client",
@@ -21,6 +22,7 @@ export async function getThreadSummaries(limit?: number): Promise<ThreadSummary[
       overall_risk: row.overall_risk,
       created_at: row.created_at,
       snippet: row.original_text.slice(0, 140),
+      finding_count: findingCount?.[0]?.count ?? 0,
     };
   });
 }

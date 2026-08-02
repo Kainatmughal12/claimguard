@@ -18,6 +18,22 @@ function UserBubble({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Draft and rewrite text render on this surface — "paper on a desk," not a
+// chat bubble, per the review-desk direction. Card is already subtly
+// lighter than the page background, so no new token is needed.
+function DocumentSurface({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="rounded-xl border border-border/70 bg-card/70 px-5 py-4"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function AssistantBubble({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
@@ -66,14 +82,14 @@ export function MessageList({
 }: MessageListProps) {
   return (
     <div className="space-y-4">
-      <UserBubble>
+      <DocumentSurface>
         <HighlightedText
           text={originalText}
           findings={findings}
           activeFindingId={activeFindingId}
           onSelectFinding={onSelectFinding}
         />
-      </UserBubble>
+      </DocumentSurface>
 
       <AssistantTurn
         status={reviewStatus}

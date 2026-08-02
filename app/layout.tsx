@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/chat/sidebar";
@@ -19,14 +19,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Display face reserved for headline moments (hero, verdict) — a serif with
-// editorial/regulatory gravitas, deliberately distinct from the sans used
-// for interface chrome, so the "verdict" of a review reads as a judgment
-// rendered, not another UI label.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Reserved for the copy under review — draft, rewrite, flagged spans — never
+// for UI chrome. Serif signals "manuscript under review," sans signals "tool."
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
-  axes: ["opsz", "SOFT", "WONK"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -44,7 +42,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <TooltipProvider delay={200}>

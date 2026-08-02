@@ -49,7 +49,7 @@ export function Composer({
   return (
     <div
       className={cn(
-        "rounded-3xl border border-border/70 bg-card/70 p-3 shadow-lg shadow-black/20 backdrop-blur-sm transition-colors focus-within:border-primary/40",
+        "rounded-3xl border border-border/70 bg-card/70 p-3 transition-colors focus-within:border-primary/40",
         className,
       )}
     >
@@ -82,7 +82,7 @@ export function Composer({
             onClick={onSubmit}
             disabled={!canSubmit}
             aria-label="Send"
-            className="rounded-full bg-[image:var(--accent-gradient)] text-primary-foreground hover:opacity-90"
+            className="rounded-full"
           >
             <ArrowUpIcon className="size-4" />
           </Button>

@@ -98,10 +98,13 @@ export function AssistantTurn({
                 if (newlyOpened) onSelectFinding(newlyOpened);
               }}
             >
-              {findings.map((finding) => (
+              {findings.map((finding, index) => (
                 <AccordionItem key={finding.id} value={finding.id} id={`finding-${finding.id}`}>
                   <AccordionTrigger className={cn("border-l-2 pl-2.5", SEVERITY_BORDER_CLASS[finding.severity])}>
                     <span className="flex flex-1 flex-wrap items-center gap-2">
+                      <span className="text-xs font-medium text-muted-foreground" aria-hidden>
+                        {index + 1}
+                      </span>
                       <ShieldAlertIcon className="size-3.5 shrink-0 text-muted-foreground" />
                       <span className="font-mono text-xs">{finding.rule_id}</span>
                       <Badge className={SEVERITY_BADGE_CLASS[finding.severity]}>

@@ -1,13 +1,8 @@
-import { ShieldCheckIcon } from "lucide-react";
-
 export function Hero() {
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8 pb-2 text-center sm:pt-16">
-      <div className="flex size-12 items-center justify-center rounded-2xl bg-[image:var(--accent-gradient)] shadow-lg shadow-primary/20">
-        <ShieldCheckIcon className="size-6 text-primary-foreground" />
-      </div>
-      <h1 className="font-heading text-3xl leading-tight font-medium tracking-tight sm:text-4xl">
-        Ask ClaimGuard to <em className="text-primary italic">review</em> your copy
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 pt-8 pb-2 text-center sm:pt-16">
+      <h1 className="text-2xl leading-tight font-medium tracking-tight sm:text-3xl">
+        Review marketing copy for compliance risk
       </h1>
       <p className="max-w-lg text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
         Paste a draft — a social post, an ad, a blog section, an email — and ClaimGuard

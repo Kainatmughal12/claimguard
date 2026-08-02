@@ -90,6 +90,7 @@ export interface ThreadSummary {
   overall_risk: OverallRisk | null;
   created_at: string;
   snippet: string;
+  finding_count: number;
 }
 
 export type FollowupStreamEvent =

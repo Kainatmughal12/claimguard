@@ -16,7 +16,42 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+import { formatRelativeDate } from "@/lib/format";
+import { CONTENT_TYPES } from "@/lib/content-types";
+import { OVERALL_RISK_LABEL, OVERALL_RISK_TEXT_CLASS } from "@/lib/severity";
 import type { ThreadSummary } from "@/lib/types";
+
+function RecentThreadRow({ thread, active }: { thread: ThreadSummary; active: boolean }) {
+  const contentTypeLabel = CONTENT_TYPES.find((c) => c.value === thread.content_type)?.label ?? thread.content_type;
+  const riskClass = thread.overall_risk ? OVERALL_RISK_TEXT_CLASS[thread.overall_risk] : "text-muted-foreground";
+  const riskLabel = thread.overall_risk ? OVERALL_RISK_LABEL[thread.overall_risk] : "Pending";
+
+  return (
+    <Link
+      href={`/review/${thread.id}`}
+      title={thread.snippet}
+      className={cn(
+        "flex gap-2 rounded-md px-2 py-1.5 text-sidebar-foreground transition-colors hover:bg-sidebar-accent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+        active && "bg-sidebar-accent",
+      )}
+    >
+      <span
+        className={cn("mt-1.5 size-1.5 shrink-0 rounded-full bg-current", riskClass)}
+        aria-hidden
+        title={riskLabel}
+      />
+      <span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+        <span className="block truncate text-xs font-medium">{thread.client_name}</span>
+        <span className="block truncate text-[0.7rem] text-sidebar-foreground/60">
+          {contentTypeLabel} · {thread.finding_count} issue{thread.finding_count === 1 ? "" : "s"} ·{" "}
+          {formatRelativeDate(thread.created_at)}
+        </span>
+        <span className="block truncate text-[0.7rem] text-sidebar-foreground/40">{thread.snippet}</span>
+      </span>
+    </Link>
+  );
+}
 
 interface AppSidebarProps {
   recentThreads: ThreadSummary[];
@@ -77,13 +112,7 @@ export function AppSidebar({ recentThreads }: AppSidebarProps) {
               <SidebarMenu>
                 {recentThreads.map((thread) => (
                   <SidebarMenuItem key={thread.id}>
-                    <SidebarMenuButton
-                      tooltip={thread.client_name}
-                      isActive={pathname === `/review/${thread.id}`}
-                      render={<Link href={`/review/${thread.id}`} />}
-                    >
-                      <span className="truncate">{thread.client_name}</span>
-                    </SidebarMenuButton>
+                    <RecentThreadRow thread={thread} active={pathname === `/review/${thread.id}`} />
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
