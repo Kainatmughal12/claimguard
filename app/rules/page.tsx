@@ -45,7 +45,7 @@ export default async function RulesPage() {
 
   if (errorMessage) {
     return (
-      <main className="mx-auto max-w-3xl p-8">
+      <main className="mx-auto max-w-3xl flex-1 min-h-0 overflow-y-auto p-8">
         <h1 className="text-2xl font-semibold tracking-tight">Compliance rule pack</h1>
         <p className="mt-4 text-sm text-destructive">Couldn&apos;t load rules: {errorMessage}</p>
       </main>
@@ -54,7 +54,7 @@ export default async function RulesPage() {
 
   if (!rules || rules.length === 0) {
     return (
-      <main className="mx-auto max-w-3xl p-8">
+      <main className="mx-auto max-w-3xl flex-1 min-h-0 overflow-y-auto p-8">
         <h1 className="text-2xl font-semibold tracking-tight">Compliance rule pack</h1>
         <p className="mt-4 text-sm text-muted-foreground">
           No rules found. Has supabase/seed.sql been applied yet?
@@ -71,7 +71,7 @@ export default async function RulesPage() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl space-y-10 px-6 py-10">
+    <main className="mx-auto max-w-3xl flex-1 min-h-0 space-y-10 overflow-y-auto px-6 py-10">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Compliance rule pack</h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

@@ -14,7 +14,11 @@ export interface FollowupContext {
 // buildReviewMessage's caller already passes to agent.stream().
 export type FollowupMessage = { role: "system" | "user" | "assistant"; content: string };
 
-export function buildFollowupMessage(context: FollowupContext, newUserMessage: string): FollowupMessage[] {
+export function buildFollowupMessage(
+  personaPrompt: string,
+  context: FollowupContext,
+  newUserMessage: string,
+): FollowupMessage[] {
   const findingsList = context.findings.length
     ? context.findings
         .map(
@@ -51,5 +55,13 @@ ${context.rewrittenText ?? "No rewrite was produced."}`;
     content: m.content,
   }));
 
-  return [{ role: "system", content: systemContext }, ...history, { role: "user", content: newUserMessage }];
+  // Gemini (via @langchain/google-genai) rejects a request with more than
+  // one system-role message ("System message should be the first one") —
+  // merge the persona and the context into a single leading system message
+  // rather than letting the caller prepend its own.
+  return [
+    { role: "system", content: `${personaPrompt}\n\n${systemContext}` },
+    ...history,
+    { role: "user", content: newUserMessage },
+  ];
 }

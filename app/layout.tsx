@@ -44,7 +44,7 @@ export default async function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="h-full flex flex-col overflow-hidden">
         <TooltipProvider delay={200}>
           <SidebarProvider>
             <AppSidebar recentThreads={recentThreads} />

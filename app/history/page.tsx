@@ -24,7 +24,7 @@ export default async function HistoryPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-10">
+    <main className="mx-auto w-full max-w-3xl flex-1 min-h-0 overflow-y-auto px-6 py-10">
       <h1 className="text-xl font-semibold tracking-tight">Review history</h1>
       <p className="mt-1 text-sm text-muted-foreground">Past compliance reviews, most recent first.</p>
 

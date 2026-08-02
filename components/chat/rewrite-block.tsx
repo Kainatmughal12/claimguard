@@ -59,6 +59,11 @@ export function RewriteBlock({ text, onReplaceOriginal, onContinue }: RewriteBlo
           <Button size="icon-xs" variant="ghost" onClick={handleExportPdf} aria-label="Export PDF">
             <PrinterIcon className="size-3.5" />
           </Button>
+          {copied && (
+            <span className="text-xs font-medium text-severity-pass" aria-live="polite">
+              Copied!
+            </span>
+          )}
           <Button size="icon-xs" variant="ghost" onClick={handleCopy} aria-label="Copy rewrite">
             {copied ? <CheckIcon className="size-3.5 text-severity-pass" /> : <CopyIcon className="size-3.5" />}
           </Button>

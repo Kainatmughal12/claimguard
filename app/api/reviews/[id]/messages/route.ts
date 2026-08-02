@@ -46,21 +46,19 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   const { review: reviewRow, findings, messages: priorMessages, client } = thread;
 
-  const messages = [
-    { role: "system" as const, content: FOLLOWUP_CHAT_PROMPT },
-    ...buildFollowupMessage(
-      {
-        client: client ?? { name: "Unknown client", specialty: "unknown", state: null, brandTone: null },
-        contentType: reviewRow.content_type,
-        originalText: reviewRow.original_text,
-        rewrittenText: reviewRow.rewritten_text,
-        agentSummary: reviewRow.agent_summary,
-        findings,
-        priorMessages,
-      },
-      userContent,
-    ),
-  ];
+  const messages = buildFollowupMessage(
+    FOLLOWUP_CHAT_PROMPT,
+    {
+      client: client ?? { name: "Unknown client", specialty: "unknown", state: null, brandTone: null },
+      contentType: reviewRow.content_type,
+      originalText: reviewRow.original_text,
+      rewrittenText: reviewRow.rewritten_text,
+      agentSummary: reviewRow.agent_summary,
+      findings,
+      priorMessages,
+    },
+    userContent,
+  );
 
   const encoder = new TextEncoder();
 
@@ -122,19 +120,34 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
           .from("messages")
           .insert({ review_id: reviewId, role: "user", content: userContent });
 
-        if (userInsertError) {
-          send({ type: "error", message: `Failed to save message: ${userInsertError.message}` });
-          return;
-        }
+        const { data: assistantRow, error: assistantInsertError } = userInsertError
+          ? { data: null, error: userInsertError }
+          : await supabaseAdmin
+              .from("messages")
+              .insert({ review_id: reviewId, role: "assistant", content: assistantText })
+              .select("*")
+              .single();
 
-        const { data: assistantRow, error: assistantInsertError } = await supabaseAdmin
-          .from("messages")
-          .insert({ review_id: reviewId, role: "assistant", content: assistantText })
-          .select("*")
-          .single();
-
-        if (assistantInsertError || !assistantRow) {
-          send({ type: "error", message: `Failed to save reply: ${assistantInsertError?.message}` });
+        if (userInsertError || assistantInsertError || !assistantRow) {
+          // A real, correctly-generated answer already exists at this point —
+          // degrade gracefully rather than discarding it over a persistence
+          // failure. It won't survive a page reload until the underlying
+          // table issue is fixed, but the user isn't left with nothing.
+          console.warn(
+            `Follow-up message persistence failed for review ${reviewId}: ${
+              (userInsertError ?? assistantInsertError)?.message
+            }`,
+          );
+          send({
+            type: "done",
+            message: {
+              id: `local-${Date.now()}`,
+              review_id: reviewId,
+              role: "assistant",
+              content: assistantText,
+              created_at: new Date().toISOString(),
+            },
+          });
           return;
         }
 

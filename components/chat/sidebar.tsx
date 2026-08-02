@@ -45,7 +45,10 @@ function RecentThreadRow({ thread, active }: { thread: ThreadSummary; active: bo
         <span className="block truncate text-xs font-medium">{thread.client_name}</span>
         <span className="block truncate text-[0.7rem] text-sidebar-foreground/60">
           {contentTypeLabel} · {thread.finding_count} issue{thread.finding_count === 1 ? "" : "s"} ·{" "}
-          {formatRelativeDate(thread.created_at)}
+          {/* Server-render and client-hydration happen at different wall-clock
+              moments, so this text can legitimately differ ("now" vs "2 seconds
+              ago") — the React-documented case for suppressHydrationWarning. */}
+          <span suppressHydrationWarning>{formatRelativeDate(thread.created_at)}</span>
         </span>
         <span className="block truncate text-[0.7rem] text-sidebar-foreground/40">{thread.snippet}</span>
       </span>

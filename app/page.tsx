@@ -12,7 +12,7 @@ export default async function Home() {
 
   if (error) {
     return (
-      <main className="flex flex-1 items-center justify-center p-8">
+      <main className="flex flex-1 min-h-0 items-center justify-center overflow-y-auto p-8">
         <p className="text-sm text-destructive">Couldn&apos;t load clients: {error.message}</p>
       </main>
     );

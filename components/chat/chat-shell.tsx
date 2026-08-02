@@ -38,6 +38,7 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   const [findings, setFindings] = useState<FindingRecord[]>(initialThread?.findings ?? []);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [attemptedSubmitWithoutSelection, setAttemptedSubmitWithoutSelection] = useState(false);
+  const [attemptedEmptySubmit, setAttemptedEmptySubmit] = useState(false);
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
@@ -53,12 +54,17 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   const hasStarted = originalText !== null;
 
   async function handleSubmitReview() {
-    if (reviewStatus === "streaming" || !composerText.trim()) return;
+    if (reviewStatus === "streaming") return;
+    if (!composerText.trim()) {
+      setAttemptedEmptySubmit(true);
+      return;
+    }
     if (!clientId || !contentType) {
       setAttemptedSubmitWithoutSelection(true);
       return;
     }
     setAttemptedSubmitWithoutSelection(false);
+    setAttemptedEmptySubmit(false);
 
     const text = composerText;
     setOriginalText(text);
@@ -103,7 +109,12 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   }
 
   async function handleSubmitFollowup() {
-    if (!reviewId || !composerText.trim() || followupStatus === "streaming") return;
+    if (!reviewId || followupStatus === "streaming") return;
+    if (!composerText.trim()) {
+      setAttemptedEmptySubmit(true);
+      return;
+    }
+    setAttemptedEmptySubmit(false);
 
     const content = composerText;
     setComposerText("");
@@ -178,10 +189,10 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   }
 
   const busy = mode === "new" ? reviewStatus === "streaming" : followupStatus === "streaming";
-  const canSubmit =
-    mode === "new"
-      ? composerText.trim().length > 0 && reviewStatus !== "streaming"
-      : composerText.trim().length > 0 && followupStatus !== "streaming";
+  // Deliberately not gated on composerText here — an empty or incomplete
+  // attempt should still reach the handlers below so they can surface an
+  // inline validation message instead of the Send button silently no-oping.
+  const canSubmit = mode === "new" ? reviewStatus !== "streaming" : followupStatus !== "streaming";
 
   const missingSelectionMessage =
     mode === "new" && attemptedSubmitWithoutSelection
@@ -194,45 +205,59 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
             : null
       : null;
 
+  const emptyTextMessage =
+    attemptedEmptySubmit && composerText.trim().length === 0
+      ? mode === "new"
+        ? "Type a draft to review before sending."
+        : "Type a message before sending."
+      : null;
+
   const composer = (
-    <Composer
-      value={composerText}
-      onChange={setComposerText}
-      onSubmit={handleComposerSubmit}
-      onCancel={handleCancel}
-      busy={busy}
-      canSubmit={canSubmit}
-      placeholder={mode === "new" ? "Paste marketing copy to review…" : "Ask a follow-up…"}
-      topSlot={
-        mode === "new" ? (
-          <div className="px-1 pb-2">
-            <div className="flex flex-wrap gap-2">
-              <ClientChip
-                clients={clients}
-                clientId={clientId}
-                onChange={setClientId}
-                disabled={reviewStatus === "streaming"}
-              />
-              <ContentTypeChip
-                contentType={contentType}
-                onChange={setContentType}
-                disabled={reviewStatus === "streaming"}
-              />
+    <div>
+      <Composer
+        value={composerText}
+        onChange={setComposerText}
+        onSubmit={handleComposerSubmit}
+        onCancel={handleCancel}
+        busy={busy}
+        canSubmit={canSubmit}
+        placeholder={mode === "new" ? "Paste marketing copy to review…" : "Ask a follow-up…"}
+        topSlot={
+          mode === "new" ? (
+            <div className="px-1 pb-2">
+              <div className="flex flex-wrap gap-2">
+                <ClientChip
+                  clients={clients}
+                  clientId={clientId}
+                  onChange={setClientId}
+                  disabled={reviewStatus === "streaming"}
+                />
+                <ContentTypeChip
+                  contentType={contentType}
+                  onChange={setContentType}
+                  disabled={reviewStatus === "streaming"}
+                />
+              </div>
+              {missingSelectionMessage && (
+                <p className="mt-1.5 text-xs text-destructive" role="alert">
+                  {missingSelectionMessage}
+                </p>
+              )}
             </div>
-            {missingSelectionMessage && (
-              <p className="mt-1.5 text-xs text-destructive" role="alert">
-                {missingSelectionMessage}
-              </p>
-            )}
-          </div>
-        ) : undefined
-      }
-    />
+          ) : undefined
+        }
+      />
+      {emptyTextMessage && (
+        <p className="mt-1.5 px-2 text-xs text-destructive" role="alert">
+          {emptyTextMessage}
+        </p>
+      )}
+    </div>
   );
 
   if (!hasStarted) {
     return (
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-4 pt-16 pb-16">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 min-h-0 flex-col gap-5 overflow-y-auto px-4 pt-16 pb-16">
         <Hero />
         {composer}
         <SuggestionChips onSelect={handleSuggestionSelect} />
@@ -241,8 +266,8 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pt-6">
-      <div className="flex-1 pb-4">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 min-h-0 flex-col px-4">
+      <div className="flex-1 min-h-0 overflow-y-auto pt-6 pb-4">
         <MessageList
           originalText={originalText}
           findings={findings}
@@ -260,7 +285,7 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
           followupError={followupError}
         />
       </div>
-      <div className="sticky bottom-4 pb-4">{composer}</div>
+      <div className="shrink-0 pb-4">{composer}</div>
     </div>
   );
 }
