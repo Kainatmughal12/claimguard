@@ -9,7 +9,7 @@ import { ProgressLog } from "@/components/progress-log";
 import { RewriteBlock } from "@/components/chat/rewrite-block";
 import { VerdictStamp } from "@/components/chat/verdict-stamp";
 import { cn } from "@/lib/utils";
-import { SEVERITY_BADGE_CLASS, SEVERITY_BORDER_CLASS, SEVERITY_LABEL } from "@/lib/severity";
+import { SEVERITY_BADGE_CLASS, SEVERITY_BORDER_CLASS, SEVERITY_LABEL, SEVERITY_TEXT_CLASS } from "@/lib/severity";
 import type { FindingRecord, ReviewRecord } from "@/lib/types";
 
 interface AssistantTurnProps {
@@ -99,13 +99,20 @@ export function AssistantTurn({
               }}
             >
               {findings.map((finding, index) => (
-                <AccordionItem key={finding.id} value={finding.id} id={`finding-${finding.id}`}>
-                  <AccordionTrigger className={cn("border-l-2 pl-2.5", SEVERITY_BORDER_CLASS[finding.severity])}>
+                <AccordionItem
+                  key={finding.id}
+                  value={finding.id}
+                  id={`finding-${finding.id}`}
+                  className={cn("border-l-2", SEVERITY_BORDER_CLASS[finding.severity])}
+                >
+                  <AccordionTrigger className="pl-2.5">
                     <span className="flex flex-1 flex-wrap items-center gap-2">
                       <span className="text-xs font-medium text-muted-foreground" aria-hidden>
                         {index + 1}
                       </span>
-                      <ShieldAlertIcon className="size-3.5 shrink-0 text-muted-foreground" />
+                      <ShieldAlertIcon
+                        className={cn("size-3.5 shrink-0", SEVERITY_TEXT_CLASS[finding.severity])}
+                      />
                       <span className="font-mono text-xs">{finding.rule_id}</span>
                       <Badge className={SEVERITY_BADGE_CLASS[finding.severity]}>
                         {SEVERITY_LABEL[finding.severity]}
@@ -116,10 +123,12 @@ export function AssistantTurn({
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="pl-2.5">
-                    <p className="text-sm leading-relaxed text-muted-foreground">
+                    <p className="text-xs leading-relaxed text-muted-foreground italic">
                       &ldquo;{finding.flagged_span}&rdquo;
                     </p>
-                    <p className="mt-2 text-sm leading-relaxed">{finding.explanation}</p>
+                    <p className="mt-2 text-sm leading-relaxed font-medium text-foreground">
+                      {finding.explanation}
+                    </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {finding.compliance_rules?.authority}
                     </p>

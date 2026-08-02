@@ -47,7 +47,11 @@ export async function getThread(id: string): Promise<Thread> {
 
   if (reviewError || !review) throw new Error(reviewError?.message ?? "Review not found");
   if (findingsError) throw new Error(findingsError.message);
-  if (messagesError) throw new Error(messagesError.message);
+  // Degrade gracefully rather than 404ing the whole thread: a thread's
+  // review + findings are the core content, follow-up history is optional.
+  if (messagesError) {
+    console.warn(`Could not load messages for review ${id}: ${messagesError.message}`);
+  }
 
   const clientRow = review.clients as unknown as {
     id: string;
@@ -70,7 +74,7 @@ export async function getThread(id: string): Promise<Thread> {
   return {
     review: review as ReviewRecord,
     findings: (findings ?? []) as FindingRecord[],
-    messages: (messages ?? []) as ChatMessage[],
+    messages: messagesError ? [] : ((messages ?? []) as ChatMessage[]),
     client,
   };
 }

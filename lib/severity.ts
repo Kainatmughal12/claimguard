@@ -27,6 +27,12 @@ export const SEVERITY_BORDER_CLASS: Record<Severity, string> = {
   low: "border-severity-low",
 };
 
+export const SEVERITY_TEXT_CLASS: Record<Severity, string> = {
+  high: "text-severity-high",
+  medium: "text-severity-medium",
+  low: "text-severity-low",
+};
+
 export const SEVERITY_UNDERLINE_CLASS: Record<Severity, string> = {
   high: "decoration-severity-high",
   medium: "decoration-severity-medium",

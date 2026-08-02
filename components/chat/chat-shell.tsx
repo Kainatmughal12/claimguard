@@ -37,6 +37,7 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   const [review, setReview] = useState<ReviewRecord | null>(initialThread?.review ?? null);
   const [findings, setFindings] = useState<FindingRecord[]>(initialThread?.findings ?? []);
   const [reviewError, setReviewError] = useState<string | null>(null);
+  const [attemptedSubmitWithoutSelection, setAttemptedSubmitWithoutSelection] = useState(false);
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
@@ -52,7 +53,12 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   const hasStarted = originalText !== null;
 
   async function handleSubmitReview() {
-    if (!clientId || !contentType || !composerText.trim() || reviewStatus === "streaming") return;
+    if (reviewStatus === "streaming" || !composerText.trim()) return;
+    if (!clientId || !contentType) {
+      setAttemptedSubmitWithoutSelection(true);
+      return;
+    }
+    setAttemptedSubmitWithoutSelection(false);
 
     const text = composerText;
     setOriginalText(text);
@@ -174,8 +180,19 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
   const busy = mode === "new" ? reviewStatus === "streaming" : followupStatus === "streaming";
   const canSubmit =
     mode === "new"
-      ? !!clientId && !!contentType && composerText.trim().length > 0 && reviewStatus !== "streaming"
+      ? composerText.trim().length > 0 && reviewStatus !== "streaming"
       : composerText.trim().length > 0 && followupStatus !== "streaming";
+
+  const missingSelectionMessage =
+    mode === "new" && attemptedSubmitWithoutSelection
+      ? !clientId && !contentType
+        ? "Choose a client and a content type before sending."
+        : !clientId
+          ? "Choose a client before sending."
+          : !contentType
+            ? "Choose a content type before sending."
+            : null
+      : null;
 
   const composer = (
     <Composer
@@ -188,18 +205,25 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
       placeholder={mode === "new" ? "Paste marketing copy to review…" : "Ask a follow-up…"}
       topSlot={
         mode === "new" ? (
-          <div className="flex flex-wrap gap-2 px-1 pb-2">
-            <ClientChip
-              clients={clients}
-              clientId={clientId}
-              onChange={setClientId}
-              disabled={reviewStatus === "streaming"}
-            />
-            <ContentTypeChip
-              contentType={contentType}
-              onChange={setContentType}
-              disabled={reviewStatus === "streaming"}
-            />
+          <div className="px-1 pb-2">
+            <div className="flex flex-wrap gap-2">
+              <ClientChip
+                clients={clients}
+                clientId={clientId}
+                onChange={setClientId}
+                disabled={reviewStatus === "streaming"}
+              />
+              <ContentTypeChip
+                contentType={contentType}
+                onChange={setContentType}
+                disabled={reviewStatus === "streaming"}
+              />
+            </div>
+            {missingSelectionMessage && (
+              <p className="mt-1.5 text-xs text-destructive" role="alert">
+                {missingSelectionMessage}
+              </p>
+            )}
           </div>
         ) : undefined
       }
