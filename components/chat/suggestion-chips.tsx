@@ -45,7 +45,7 @@ export function SuggestionChips({ onSelect, disabled, className }: SuggestionChi
           type="button"
           disabled={disabled}
           onClick={() => onSelect({ contentType: draft.contentType, text: draft.text })}
-          className="inline-flex items-center rounded-full border border-border/70 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex items-center rounded-full border border-border/70 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 ease-out hover:scale-[1.03] hover:border-primary/40 hover:bg-primary/10 hover:text-foreground active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
         >
           {draft.label}
         </button>

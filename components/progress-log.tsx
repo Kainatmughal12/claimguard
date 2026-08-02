@@ -39,9 +39,10 @@ export function ProgressLog({ messages, collapsed = false, elapsedSeconds }: Pro
           return (
             <motion.li
               key={i}
-              initial={{ opacity: 0, y: 4 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className={cn("flex items-start gap-2", done ? "text-muted-foreground" : "text-foreground")}
             >
               <span className="mt-0.5 shrink-0" aria-hidden>

@@ -28,7 +28,7 @@ export function VerdictStamp({ risk, delay = 0 }: VerdictStampProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: reduceMotion ? 0.2 : 0.3, delay }}
+      transition={{ duration: reduceMotion ? 0.15 : 0.25, ease: "easeOut", delay }}
       className={cn(
         "inline-flex shrink-0 flex-col items-center gap-0.5 rounded-md border-[3px] px-4 py-1.5",
         "before:pointer-events-none before:absolute before:inset-[3px] before:rounded-[3px] before:border before:border-current before:opacity-40",

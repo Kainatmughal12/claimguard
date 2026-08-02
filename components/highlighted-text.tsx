@@ -79,7 +79,7 @@ export function HighlightedText({
               }
             }}
             className={cn(
-              "cursor-pointer px-0.5 text-foreground underline decoration-2 underline-offset-2 transition-colors hover:brightness-95 dark:hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "cursor-pointer px-0.5 text-foreground underline decoration-2 underline-offset-2 transition-all duration-200 ease-out hover:brightness-95 dark:hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               SEVERITY_HIGHLIGHT_CLASS[segment.finding.severity],
               SEVERITY_UNDERLINE_CLASS[segment.finding.severity],
               activeFindingId === segment.finding.id && "ring-1 ring-ring",

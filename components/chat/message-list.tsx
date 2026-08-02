@@ -10,7 +10,7 @@ function UserBubble({ children }: { children: React.ReactNode }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className="ml-auto max-w-xl rounded-2xl rounded-tr-sm bg-primary/15 px-4 py-2.5 text-sm leading-relaxed"
     >
       {children}
@@ -26,7 +26,7 @@ function DocumentSurface({ children }: { children: React.ReactNode }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className="rounded-xl border border-border/70 bg-card/70 px-5 py-4 shadow-md shadow-black/25"
     >
       {children}
@@ -39,7 +39,7 @@ function AssistantBubble({ children }: { children: React.ReactNode }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className="max-w-xl whitespace-pre-wrap rounded-2xl rounded-tl-sm bg-card/60 px-4 py-2.5 text-sm leading-relaxed"
     >
       {children}

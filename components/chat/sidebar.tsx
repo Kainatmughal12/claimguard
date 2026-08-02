@@ -32,7 +32,7 @@ function RecentThreadRow({ thread, active }: { thread: ThreadSummary; active: bo
       href={`/review/${thread.id}`}
       title={thread.snippet}
       className={cn(
-        "flex gap-2 rounded-md px-2 py-1.5 text-sidebar-foreground transition-colors hover:bg-sidebar-accent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+        "flex gap-2 rounded-md px-2 py-1.5 text-sidebar-foreground transition-all duration-200 ease-out hover:bg-sidebar-accent active:scale-[0.98] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
         active && "bg-sidebar-accent",
       )}
     >
