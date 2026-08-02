@@ -1,6 +1,5 @@
 "use client";
 
-import { SparklesIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ContentType } from "@/lib/types";
 
@@ -46,9 +45,8 @@ export function SuggestionChips({ onSelect, disabled, className }: SuggestionChi
           type="button"
           disabled={disabled}
           onClick={() => onSelect({ contentType: draft.contentType, text: draft.text })}
-          className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex items-center rounded-full border border-border/70 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
         >
-          <SparklesIcon className="size-3.5 text-primary/70 group-hover:text-primary" />
           {draft.label}
         </button>
       ))}

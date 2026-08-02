@@ -208,7 +208,7 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
 
   if (!hasStarted) {
     return (
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-6 px-4 pb-16">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-4 pt-16 pb-16">
         <Hero />
         {composer}
         <SuggestionChips onSelect={handleSuggestionSelect} />
