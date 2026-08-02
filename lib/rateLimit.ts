@@ -25,9 +25,7 @@ export function extractRetryDelaySeconds(err: unknown): number | null {
 export function sanitizeErrorMessage(err: unknown): string {
   if (isRateLimitError(err)) {
     const delay = extractRetryDelaySeconds(err);
-    return delay
-      ? `Model rate limit reached (free tier). Retrying automatically in ~${delay}s…`
-      : "Model rate limit reached (free tier). Retrying automatically…";
+    return delay ? `Model is busy — retrying in ~${delay}s…` : "Model is busy — retrying automatically…";
   }
   return "Something went wrong while reviewing this draft. Please try again.";
 }

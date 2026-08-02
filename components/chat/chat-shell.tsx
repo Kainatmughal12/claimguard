@@ -91,6 +91,11 @@ export function ChatShell({ clients, initialThread }: ChatShellProps) {
           setReviewId(event.reviewId);
           setElapsedSeconds(Math.round((Date.now() - streamStartedAtRef.current) / 1000));
           setReviewStatus("done");
+          // Swap in the permanent URL without a Next.js route transition —
+          // a router.push/replace would remount ChatShell from the server
+          // (losing the just-streamed state); this only updates the address
+          // bar so a refresh lands on /review/[id] instead of a blank form.
+          window.history.replaceState(null, "", `/review/${event.reviewId}`);
         } else if (event.type === "error") {
           setReviewError(event.message);
           setReviewStatus("error");
