@@ -53,22 +53,26 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Dark-only product — ship a single rich-charcoal palette instead of a
+/* Dark-only product — ship a single rich navy-charcoal palette instead of a
    light/dark pair that no one will see (html always carries class="dark",
-   set server-side in layout.tsx, so there's no flash to guard against). */
+   set server-side in layout.tsx, so there's no flash to guard against).
+   Elevation is a flat lightness ladder, not gradients or glow: background
+   (deepest) < sidebar < card/popover < muted chrome bars. Each tier reuses
+   the same hue family so the steps read as one surface, not mismatched
+   panels. */
 :root,
 .dark {
-  --background: oklch(0.16 0.012 262);
+  --background: oklch(0.13 0.016 258);
   --foreground: oklch(0.96 0.004 262);
-  --card: oklch(0.205 0.014 262);
+  --card: oklch(0.21 0.017 258);
   --card-foreground: oklch(0.96 0.004 262);
-  --popover: oklch(0.215 0.015 262);
+  --popover: oklch(0.225 0.018 258);
   --popover-foreground: oklch(0.96 0.004 262);
   --primary: oklch(0.62 0.13 252);
   --primary-foreground: oklch(0.98 0.006 262);
-  --secondary: oklch(0.255 0.015 262);
+  --secondary: oklch(0.26 0.016 258);
   --secondary-foreground: oklch(0.93 0.006 262);
-  --muted: oklch(0.24 0.013 262);
+  --muted: oklch(0.255 0.015 258);
   --muted-foreground: oklch(0.66 0.014 262);
   --accent: oklch(0.26 0.035 252);
   --accent-foreground: oklch(0.96 0.01 252);
@@ -89,11 +93,11 @@
   --severity-medium: oklch(0.78 0.12 70);
   --severity-low: oklch(0.75 0.02 258);
   --severity-pass: oklch(0.75 0.11 145);
-  --sidebar: oklch(0.145 0.011 262);
+  --sidebar: oklch(0.155 0.015 258);
   --sidebar-foreground: oklch(0.93 0.006 262);
   --sidebar-primary: oklch(0.62 0.13 252);
   --sidebar-primary-foreground: oklch(0.98 0.006 262);
-  --sidebar-accent: oklch(0.22 0.014 262);
+  --sidebar-accent: oklch(0.195 0.015 258);
   --sidebar-accent-foreground: oklch(0.96 0.004 262);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.62 0.13 252);

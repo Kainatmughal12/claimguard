@@ -57,7 +57,7 @@ export function AssistantTurn({
   }, [activeFindingId]);
 
   return (
-    <div className="max-w-2xl space-y-4 rounded-2xl border border-border/60 bg-card/50 p-4">
+    <div className="max-w-2xl space-y-4 rounded-2xl border border-border/60 bg-card/50 p-4 shadow-md shadow-black/25">
       <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
         <span className="text-[0.65rem] font-medium tracking-[0.16em] text-muted-foreground/70 uppercase">
           Compliance review

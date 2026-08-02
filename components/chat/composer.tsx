@@ -49,7 +49,7 @@ export function Composer({
   return (
     <div
       className={cn(
-        "rounded-3xl border border-border/70 bg-card/70 p-3 transition-colors focus-within:border-primary/40",
+        "rounded-3xl border border-border/70 bg-card/70 p-3 shadow-lg shadow-black/30 transition-colors focus-within:border-primary/40",
         className,
       )}
     >

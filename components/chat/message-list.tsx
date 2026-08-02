@@ -27,7 +27,7 @@ function DocumentSurface({ children }: { children: React.ReactNode }) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="rounded-xl border border-border/70 bg-card/70 px-5 py-4"
+      className="rounded-xl border border-border/70 bg-card/70 px-5 py-4 shadow-md shadow-black/25"
     >
       {children}
     </motion.div>
