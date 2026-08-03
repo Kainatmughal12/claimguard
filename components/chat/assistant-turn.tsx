@@ -6,6 +6,7 @@ import { ShieldAlertIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProgressLog } from "@/components/progress-log";
+import { Markdown } from "@/components/markdown";
 import { RewriteBlock } from "@/components/chat/rewrite-block";
 import { VerdictStamp } from "@/components/chat/verdict-stamp";
 import { cn } from "@/lib/utils";
@@ -84,7 +85,7 @@ export function AssistantTurn({
                   {findings.length} issue{findings.length === 1 ? "" : "s"} found
                 </p>
               )}
-              <p className="mt-1 text-sm leading-relaxed">{review.agent_summary}</p>
+              <Markdown className="mt-1">{review.agent_summary}</Markdown>
             </div>
           </div>
 
@@ -126,9 +127,7 @@ export function AssistantTurn({
                     <p className="text-xs leading-relaxed text-muted-foreground italic">
                       &ldquo;{finding.flagged_span}&rdquo;
                     </p>
-                    <p className="mt-2 text-sm leading-relaxed font-medium text-foreground">
-                      {finding.explanation}
-                    </p>
+                    <Markdown className="mt-2 font-medium text-foreground">{finding.explanation}</Markdown>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {finding.compliance_rules?.authority}
                     </p>
@@ -136,7 +135,7 @@ export function AssistantTurn({
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Suggested fix
                       </p>
-                      <p className="mt-1 text-sm leading-relaxed">{finding.suggested_fix}</p>
+                      <Markdown className="mt-1">{finding.suggested_fix}</Markdown>
                     </div>
                   </AccordionContent>
                 </AccordionItem>

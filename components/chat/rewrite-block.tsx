@@ -49,7 +49,7 @@ export function RewriteBlock({ text, onReplaceOriginal, onContinue }: RewriteBlo
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/70 bg-card/70 shadow-md shadow-black/25">
+    <div className="overflow-hidden rounded-md border border-border/70 bg-card/70 shadow-md shadow-black/25">
       <div className="flex items-center justify-between border-b border-border/70 bg-muted/40 px-3 py-2">
         <p className="font-mono text-xs font-medium text-muted-foreground">Compliant rewrite</p>
         <div className="flex items-center gap-1">
